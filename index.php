@@ -1,3 +1,10 @@
+<?php
+require_once 'db/db.php';
+$categories = [];
+$res = $conn->query("SELECT name, photo FROM category");
+while ($row = $res->fetch_assoc())
+  $categories[] = $row;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -108,38 +115,17 @@
         </div>
         <div class="row align-items-stretch">
           <!-- Modern category cards row -->
-          <div class="col-lg-3 col-md-6 mb-4">
-            <div class="category-card">
-              <img src="images/baby-clothes.png" alt="Women" class="category-img">
-              <div class="category-info">
-                <div class="category-title">საბავშვო ორეული</div>
+          <?php foreach ($categories as $cat): ?>
+            <div class="col-lg-3 col-md-6 mb-4">
+              <div class="category-card">
+                <img src="<?= htmlspecialchars($cat['photo'] ?: 'images/baby-clothes.png') ?>"
+                  alt="<?= htmlspecialchars($cat['name']) ?>" class="category-img">
+                <div class="category-info">
+                  <div class="category-title"><?= htmlspecialchars($cat['name']) ?></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-lg-3 col-md-6 mb-4">
-            <div class="category-card">
-              <img src="images/baby-clothes.png" alt="Women" class="category-img">
-              <div class="category-info">
-                <div class="category-title">საბავშვო ორეული</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 mb-4">
-            <div class="category-card">
-              <img src="images/baby-clothes.png" alt="Women" class="category-img">
-              <div class="category-info">
-                <div class="category-title">საბავშვო ორეული</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 mb-4">
-            <div class="category-card">
-              <img src="images/baby-clothes.png" alt="Women" class="category-img">
-              <div class="category-info">
-                <div class="category-title">საბავშვო ორეული</div>
-              </div>
-            </div>
-          </div>
+          <?php endforeach; ?>
         </div>
       </div>
     </div>
