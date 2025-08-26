@@ -42,6 +42,7 @@ while ($row = $res->fetch_assoc()) {
 
 <body>
 	<div class="container mt-4">
+		<a href="../dashboard.php" class="btn btn-secondary" style="margin-bottom: 18px;">&#8592; Back</a>
 		<h2 style="margin-bottom: 20px;">Category Management</h2>
 		<button class="btn btn-success" data-toggle="modal" data-target="#addCategoryModal">Add Category</button>
 		<button class="btn btn-primary" data-toggle="modal" data-target="#addSubcategoryModal">Add Subcategory</button>
