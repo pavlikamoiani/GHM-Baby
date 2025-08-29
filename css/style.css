@@ -1,5 +1,12 @@
+@font-face {
+  font-family: "BPG Rioni Arial";
+  src: url("fonts/bpg_rioni_arial.otf") format("opentype");
+}
+
 * {
   scroll-behavior: smooth;
+  font-family: "BPG Rioni Arial", "Noto Sans Georgian", sans-serif;
+
 }
 
 /* Base */
@@ -727,6 +734,10 @@ a:hover {
 .site-blocks-cover .site-block-cover-content {
   margin-top: 20%;
   text-align: center;
+}
+
+.site-block-cover-content h1 {
+  font-size: 60px;
 }
 
 @media (min-width: 768px) {

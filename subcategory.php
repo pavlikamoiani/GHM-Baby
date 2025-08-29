@@ -71,9 +71,12 @@ $category = $cat_res->fetch_assoc();
 				}
 				?>
 				<div class="row">
-					<?php foreach ($products as $prod): ?>
+					<?php foreach ($products as $prod):
+						$prod_id_res = $conn->query("SELECT id FROM product WHERE name = '" . $conn->real_escape_string($prod['name']) . "' LIMIT 1");
+						$prod_id = $prod_id_res->fetch_assoc()['id'] ?? 0;
+						?>
 						<div class="col-lg-4 col-md-6 item-entry mb-4">
-							<a href="#" class="product-item md-height bg-gray d-block">
+							<a href="product.php?id=<?= urlencode($prod_id) ?>" class="product-item md-height bg-gray d-block">
 								<?php
 								$photos = json_decode($prod['photo'], true);
 								if (is_array($photos) && count($photos) > 0 && !empty($photos[0])) {
@@ -83,7 +86,9 @@ $category = $cat_res->fetch_assoc();
 								}
 								?>
 							</a>
-							<h2 class="item-title"><a href="#"><?= htmlspecialchars($prod['name']) ?></a></h2>
+							<h2 class="item-title"><a
+									href="product.php?id=<?= urlencode($prod_id) ?>"><?= htmlspecialchars($prod['name']) ?></a>
+							</h2>
 							<?php if (!empty($prod['price'])): ?>
 								<strong class="item-price">₾<?= htmlspecialchars($prod['price']) ?></strong>
 							<?php endif; ?>
