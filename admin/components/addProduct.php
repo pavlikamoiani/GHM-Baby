@@ -14,7 +14,7 @@ while ($row = $res->fetch_assoc()) {
 }
 
 $products = [];
-$res = $conn->query("SELECT p.id, p.name, p.photo, p.category_id, p.subcategory_id, 
+$res = $conn->query("SELECT p.id, p.name, p.photo, p.price, p.size, p.material, p.category_id, p.subcategory_id, 
 	c.name as category_name, s.name as subcategory_name
 	FROM product p
 	LEFT JOIN category c ON p.category_id = c.id
@@ -59,6 +59,9 @@ while ($row = $res->fetch_assoc())
 					<th>#</th>
 					<th>Photo</th>
 					<th>Name</th>
+					<th>Price</th>
+					<th>Size</th>
+					<th>Material</th>
 					<th>Category</th>
 					<th>Subcategory</th>
 					<th>Actions</th>
@@ -68,12 +71,28 @@ while ($row = $res->fetch_assoc())
 				<?php foreach ($products as $prod): ?>
 					<tr data-id="<?= $prod['id'] ?>" data-name="<?= htmlspecialchars($prod['name']) ?>"
 						data-photo="<?= htmlspecialchars($prod['photo']) ?>"
+						data-price="<?= htmlspecialchars($prod['price']) ?>"
+						data-size="<?= htmlspecialchars($prod['size']) ?>"
+						data-material="<?= htmlspecialchars($prod['material']) ?>"
 						data-category="<?= htmlspecialchars($prod['category_id']) ?>"
 						data-subcategory="<?= htmlspecialchars($prod['subcategory_id']) ?>">
 						<td><?= $prod['id'] ?></td>
-						<td><img src="../../<?= htmlspecialchars($prod['photo'] ?: 'images/baby-clothes.png') ?>"
-								class="table-img"></td>
+						<td>
+							<?php
+							$photos = json_decode($prod['photo'], true);
+							if (is_array($photos) && count($photos) > 0) {
+								foreach ($photos as $p) {
+									echo '<img src="../../' . htmlspecialchars($p) . '" class="table-img" style="margin-right:2px;">';
+								}
+							} else {
+								echo '<img src="../../images/baby-clothes.png" class="table-img">';
+							}
+							?>
+						</td>
 						<td><?= htmlspecialchars($prod['name']) ?></td>
+						<td><?= htmlspecialchars($prod['price']) ?></td>
+						<td><?= htmlspecialchars($prod['size']) ?></td>
+						<td><?= htmlspecialchars($prod['material']) ?></td>
 						<td><?= htmlspecialchars($prod['category_name']) ?></td>
 						<td><?= htmlspecialchars($prod['subcategory_name']) ?></td>
 						<td>
@@ -100,7 +119,10 @@ while ($row = $res->fetch_assoc())
 				<div class="modal-body">
 					<input type="text" name="product_name" class="form-control mb-2" placeholder="Product Name"
 						required>
-					<input type="file" name="product_photo" class="form-control mb-2" accept="image/*">
+					<input type="number" step="0.01" name="product_price" class="form-control mb-2" placeholder="Price">
+					<input type="text" name="product_size" class="form-control mb-2" placeholder="Size">
+					<input type="text" name="product_material" class="form-control mb-2" placeholder="Material">
+					<input type="file" name="product_photo[]" class="form-control mb-2" accept="image/*" multiple>
 					<select name="category_id" id="category_select" class="form-control mb-2" required>
 						<option value="">Select Category</option>
 						<?php foreach ($categories as $cat): ?>
@@ -131,8 +153,14 @@ while ($row = $res->fetch_assoc())
 					<input type="hidden" name="edit_product_id" id="edit_product_id">
 					<input type="text" name="edit_product_name" id="edit_product_name" class="form-control mb-2"
 						placeholder="Product Name" required>
-					<input type="file" name="edit_product_photo" class="form-control mb-2" accept="image/*">
-					<img id="edit_product_preview" src="" style="width:60px;height:60px;margin-top:10px;">
+					<input type="number" step="0.01" name="edit_product_price" id="edit_product_price"
+						class="form-control mb-2" placeholder="Price">
+					<input type="text" name="edit_product_size" id="edit_product_size" class="form-control mb-2"
+						placeholder="Size">
+					<input type="text" name="edit_product_material" id="edit_product_material" class="form-control mb-2"
+						placeholder="Material">
+					<input type="file" name="edit_product_photo[]" class="form-control mb-2" accept="image/*" multiple>
+					<div id="edit_product_preview_container" style="margin-top:10px;"></div>
 					<select name="edit_category_id" id="edit_category_select" class="form-control mb-2" required>
 						<option value="">Select Category</option>
 						<?php foreach ($categories as $cat): ?>
@@ -175,15 +203,36 @@ while ($row = $res->fetch_assoc())
 			var id = tr.data('id');
 			var name = tr.data('name');
 			var photo = tr.data('photo');
+			var price = tr.data('price');
+			var size = tr.data('size');
+			var material = tr.data('material');
 			var category = tr.data('category');
 			var subcategory = tr.data('subcategory');
 			$('#edit_product_id').val(id);
 			$('#edit_product_name').val(name);
-			$('#edit_product_preview').attr('src', '../../' + (photo ? photo : 'images/baby-clothes.png'));
+			$('#edit_product_price').val(price);
+			$('#edit_product_size').val(size);
+			$('#edit_product_material').val(material);
+
+			var previewContainer = $('#edit_product_preview_container');
+			previewContainer.empty();
+			try {
+				var photos = JSON.parse(photo);
+				if (Array.isArray(photos) && photos.length > 0) {
+					photos.forEach(function (p) {
+						previewContainer.append('<img src="../../' + p + '" style="width:60px;height:60px;margin-right:5px;">');
+					});
+				} else {
+					previewContainer.append('<img src="../../images/baby-clothes.png" style="width:60px;height:60px;">');
+				}
+			} catch (e) {
+				previewContainer.append('<img src="../../images/baby-clothes.png" style="width:60px;height:60px;">');
+			}
+
 			$('#edit_category_select').val(category).trigger('change');
 			setTimeout(function () {
 				$('#edit_subcategory_select').val(subcategory);
-			}, 100); // wait for subcategory options to load
+			}, 100);
 			$('#editProductModal').modal('show');
 		});
 

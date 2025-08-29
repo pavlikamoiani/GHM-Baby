@@ -1,7 +1,7 @@
 <?php
 require_once 'db/db.php';
 $categories = [];
-$res = $conn->query("SELECT id, name, photo FROM category"); // <-- добавлен id
+$res = $conn->query("SELECT id, name, photo FROM category");
 while ($row = $res->fetch_assoc())
   $categories[] = $row;
 ?>
@@ -40,7 +40,7 @@ while ($row = $res->fetch_assoc())
             <div class="site-block-cover-content">
               <h2 class="sub-title">#New Collection 2025</h2>
               <h1>GHM Baby Sales</h1>
-              <p><a href="#" class="btn btn-black rounded-0">Shop Now</a></p>
+              <p><a href="#products" class="btn btn-black rounded-0">Shop Now</a></p>
             </div>
           </div>
           <div class="col-md-6 order-1 align-self-end">
@@ -56,7 +56,6 @@ while ($row = $res->fetch_assoc())
           <h2 class="text-uppercase"><span class="d-block">Discover</span> The Collections</h2>
         </div>
         <div class="row align-items-stretch">
-          <!-- Modern category cards row -->
           <?php foreach ($categories as $cat): ?>
             <div class="col-lg-3 col-md-6 mb-4">
               <div class="category-card">
@@ -82,70 +81,30 @@ while ($row = $res->fetch_assoc())
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-4 col-md-6 item-entry mb-4">
-          <a href="#" class="product-item md-height bg-gray d-block">
-            <img src="images/529286276_754021850905984_8877261133750311679_n-removebg-preview.png" alt="Image"
-              class="img-fluid">
-          </a>
-          <h2 class="item-title"><a href="#">Gray Shoe</a></h2>
-          <strong class="item-price">$20.00</strong>
-        </div>
-        <div class="col-lg-4 col-md-6 item-entry mb-4">
-          <a href="#" class="product-item md-height bg-gray d-block">
-            <img src="images/529286276_754021850905984_8877261133750311679_n-removebg-preview.png" alt="Image"
-              class="img-fluid">
-          </a>
-          <h2 class="item-title"><a href="#">Blue Shoe High Heels</a></h2>
-          <strong class="item-price"><del>$46.00</del> $28.00</strong>
-        </div>
-
-        <div class="col-lg-4 col-md-6 item-entry mb-4">
-          <a href="#" class="product-item md-height bg-gray d-block">
-            <img src="images/529286276_754021850905984_8877261133750311679_n-removebg-preview.png" alt="Image"
-              class="img-fluid">
-          </a>
-          <h2 class="item-title"><a href="#">Denim Jacket</a></h2>
-          <strong class="item-price"><del>$46.00</del> $28.00</strong>
-
-          <div class="star-rating">
-            <span class="icon-star2 text-warning"></span>
-            <span class="icon-star2 text-warning"></span>
-            <span class="icon-star2 text-warning"></span>
-            <span class="icon-star2 text-warning"></span>
-            <span class="icon-star2 text-warning"></span>
+        <?php
+        $products = [];
+        $prod_res = $conn->query("SELECT name, photo, price FROM product ORDER BY id DESC LIMIT 12");
+        while ($row = $prod_res->fetch_assoc())
+          $products[] = $row;
+        foreach ($products as $prod):
+          ?>
+          <div class="col-lg-4 col-md-6 item-entry mb-4">
+            <a href="#" class="product-item md-height bg-gray d-block">
+              <?php
+              $photos = json_decode($prod['photo'], true);
+              if (is_array($photos) && count($photos) > 0 && !empty($photos[0])) {
+                echo '<img src="' . htmlspecialchars($photos[0]) . '" alt="Image" class="img-fluid">';
+              } else {
+                echo '<img src="images/baby-clothes.png" alt="Image" class="img-fluid">';
+              }
+              ?>
+            </a>
+            <h2 class="item-title"><a href="#"><?= htmlspecialchars($prod['name']) ?></a></h2>
+            <?php if (!empty($prod['price'])): ?>
+              <strong class="item-price">₾<?= htmlspecialchars($prod['price']) ?></strong>
+            <?php endif; ?>
           </div>
-
-        </div>
-        <div class="col-lg-4 col-md-6 item-entry mb-4">
-          <a href="#" class="product-item md-height bg-gray d-block">
-            <img src="images/prod_1.png" alt="Image" class="img-fluid">
-          </a>
-          <h2 class="item-title"><a href="#">Leather Green Bag</a></h2>
-          <strong class="item-price"><del>$46.00</del> $28.00</strong>
-          <div class="star-rating">
-            <span class="icon-star2 text-warning"></span>
-            <span class="icon-star2 text-warning"></span>
-            <span class="icon-star2 text-warning"></span>
-            <span class="icon-star2 text-warning"></span>
-            <span class="icon-star2 text-warning"></span>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 item-entry mb-4">
-          <a href="#" class="product-item md-height bg-gray d-block">
-            <img src="images/model_1.png" alt="Image" class="img-fluid">
-          </a>
-          <h2 class="item-title"><a href="#">Smooth Cloth</a></h2>
-          <strong class="item-price"><del>$46.00</del> $28.00</strong>
-        </div>
-        <div class="col-lg-4 col-md-6 item-entry mb-4">
-          <a href="#" class="product-item md-height bg-gray d-block">
-            <img src="images/model_7.png" alt="Image" class="img-fluid">
-          </a>
-          <h2 class="item-title"><a href="#">Yellow Jacket</a></h2>
-          <strong class="item-price">$58.00</strong>
-        </div>
-
+        <?php endforeach; ?>
       </div>
     </div>
   </div>
@@ -160,90 +119,39 @@ while ($row = $res->fetch_assoc())
       <div class="row">
         <div class="col-md-12 block-3">
           <div class="nonloop-block-3 owl-carousel">
-            <div class="item">
-              <div class="item-entry">
-                <a href="#" class="product-item md-height bg-gray d-block">
-                  <img src="images/model_1.png" alt="Image" class="img-fluid">
-                </a>
-                <h2 class="item-title"><a href="#">Smooth Cloth</a></h2>
-                <strong class="item-price"><del>$46.00</del> $28.00</strong>
-                <div class="star-rating">
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
+            <?php
+            $rated_products = [];
+            $res = $conn->query("SELECT name, photo, price FROM product ORDER BY id DESC LIMIT 10");
+            while ($row = $res->fetch_assoc())
+              $rated_products[] = $row;
+            foreach ($rated_products as $prod):
+              ?>
+              <div class="item">
+                <div class="item-entry">
+                  <a href="#" class="product-item md-height bg-gray d-block">
+                    <?php
+                    $photos = json_decode($prod['photo'], true);
+                    if (is_array($photos) && count($photos) > 0 && !empty($photos[0])) {
+                      echo '<img src="' . htmlspecialchars($photos[0]) . '" alt="Image" class="img-fluid">';
+                    } else {
+                      echo '<img src="images/baby-clothes.png" alt="Image" class="img-fluid">';
+                    }
+                    ?>
+                  </a>
+                  <h2 class="item-title"><a href="#"><?= htmlspecialchars($prod['name']) ?></a></h2>
+                  <?php if (!empty($prod['price'])): ?>
+                    <strong class="item-price">₾<?= htmlspecialchars($prod['price']) ?></strong>
+                  <?php endif; ?>
+                  <div class="star-rating">
+                    <span class="icon-star2 text-warning"></span>
+                    <span class="icon-star2 text-warning"></span>
+                    <span class="icon-star2 text-warning"></span>
+                    <span class="icon-star2 text-warning"></span>
+                    <span class="icon-star2 text-warning"></span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="item">
-              <div class="item-entry">
-                <a href="#" class="product-item md-height bg-gray d-block">
-                  <img src="images/prod_3.png" alt="Image" class="img-fluid">
-                </a>
-                <h2 class="item-title"><a href="#">Blue Shoe High Heels</a></h2>
-                <strong class="item-price"><del>$46.00</del> $28.00</strong>
-
-                <div class="star-rating">
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <div class="item-entry">
-                <a href="#" class="product-item md-height bg-gray d-block">
-                  <img src="images/model_5.png" alt="Image" class="img-fluid">
-                </a>
-                <h2 class="item-title"><a href="#">Denim Jacket</a></h2>
-                <strong class="item-price"><del>$46.00</del> $28.00</strong>
-
-                <div class="star-rating">
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                </div>
-
-              </div>
-            </div>
-            <div class="item">
-              <div class="item-entry">
-                <a href="#" class="product-item md-height bg-gray d-block">
-                  <img src="images/prod_1.png" alt="Image" class="img-fluid">
-                </a>
-                <h2 class="item-title"><a href="#">Leather Green Bag</a></h2>
-                <strong class="item-price"><del>$46.00</del> $28.00</strong>
-                <div class="star-rating">
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <div class="item-entry">
-                <a href="#" class="product-item md-height bg-gray d-block">
-                  <img src="images/model_7.png" alt="Image" class="img-fluid">
-                </a>
-                <h2 class="item-title"><a href="#">Yellow Jacket</a></h2>
-                <strong class="item-price">$58.00</strong>
-                <div class="star-rating">
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                  <span class="icon-star2 text-warning"></span>
-                </div>
-              </div>
-            </div>
-
+            <?php endforeach; ?>
           </div>
         </div>
       </div>
@@ -256,13 +164,13 @@ while ($row = $res->fetch_assoc())
       <div class="row">
         <div class="col-md-6 ml-auto order-md-2 align-self-start">
           <div class="site-block-cover-content">
-            <h2 class="sub-title">#New Summer Collection 2020</h2>
-            <h1>New Shoes</h1>
-            <p><a href="#" class="btn btn-black rounded-0">Shop Now</a></p>
+            <h2 class="sub-title">#New Collection 2025</h2>
+            <h1>GHM Baby Sales</h1>
+            <p><a href="#products" class="btn btn-black rounded-0">Shop Now</a></p>
           </div>
         </div>
         <div class="col-md-6 order-1 align-self-end">
-          <img src="images/model_6.png" alt="Image" class="img-fluid">
+          <img src="images/footer-image.png" alt="Image" class="img-fluid">
         </div>
       </div>
     </div>

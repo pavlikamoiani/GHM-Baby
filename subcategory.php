@@ -61,22 +61,32 @@ $category = $cat_res->fetch_assoc();
 					<?php endforeach; ?>
 				</div>
 			<?php else: ?>
+				<?php
+				$products = [];
+				$prod_res = $conn->query("SELECT name, photo, price FROM product WHERE category_id = $category_id");
+				while ($row = $prod_res->fetch_assoc())
+					$products[] = $row;
+				if (count($products) === 0) {
+					echo '<p>ამ კატეგორიაში პროდუქტები არ არის.</p>';
+				}
+				?>
 				<div class="row">
-					<?php
-					$products = [];
-					$prod_res = $conn->query("SELECT name, photo FROM product WHERE category_id = $category_id");
-					while ($row = $prod_res->fetch_assoc())
-						$products[] = $row;
-					if (count($products) === 0) {
-						echo '<p>Нет товаров в этой категории.</p>';
-					}
-					foreach ($products as $prod): ?>
+					<?php foreach ($products as $prod): ?>
 						<div class="col-lg-4 col-md-6 item-entry mb-4">
-							<div class="product-item md-height bg-gray d-block">
-								<img src="<?= htmlspecialchars($prod['photo'] ?: 'images/baby-clothes.png') ?>" alt="Image"
-									class="img-fluid">
-							</div>
-							<h2 class="item-title"><?= htmlspecialchars($prod['name']) ?></h2>
+							<a href="#" class="product-item md-height bg-gray d-block">
+								<?php
+								$photos = json_decode($prod['photo'], true);
+								if (is_array($photos) && count($photos) > 0 && !empty($photos[0])) {
+									echo '<img src="' . htmlspecialchars($photos[0]) . '" alt="Image" class="img-fluid">';
+								} else {
+									echo '<img src="images/baby-clothes.png" alt="Image" class="img-fluid">';
+								}
+								?>
+							</a>
+							<h2 class="item-title"><a href="#"><?= htmlspecialchars($prod['name']) ?></a></h2>
+							<?php if (!empty($prod['price'])): ?>
+								<strong class="item-price">₾<?= htmlspecialchars($prod['price']) ?></strong>
+							<?php endif; ?>
 						</div>
 					<?php endforeach; ?>
 				</div>
