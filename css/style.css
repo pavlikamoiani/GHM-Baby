@@ -738,6 +738,7 @@ a:hover {
 
 .site-block-cover-content h1 {
   font-size: 60px;
+  color: #f79601;
 }
 
 @media (min-width: 768px) {

@@ -14,6 +14,12 @@ if (!$product) {
 $photos = json_decode($product['photo'], true);
 if (!is_array($photos))
 	$photos = [];
+$colors = [];
+if (!empty($product['color'])) {
+	$colors = json_decode($product['color'], true);
+	if (!is_array($colors))
+		$colors = [];
+}
 
 // Get category info
 $cat_res = $conn->query("SELECT id, name FROM category WHERE id = " . intval($product['category_id']));
@@ -83,7 +89,8 @@ if (!empty($product['size'])) {
 		.product-images {
 			flex: 1;
 			display: flex;
-			gap: 20px;
+			gap: 32px;
+			align-items: flex-start;
 		}
 
 		.product-main-img {
@@ -113,6 +120,11 @@ if (!empty($product['size'])) {
 			border-radius: 8px;
 			cursor: pointer;
 			border: 2px solid #eee;
+		}
+
+		.product-thumb.selected {
+			border-color: #f79601;
+			box-shadow: 0 0 0 2px #f7960155;
 		}
 
 		.product-info {
@@ -244,6 +256,40 @@ if (!empty($product['size'])) {
 		.add-to-cart-btn:hover {
 			background: #f79601;
 		}
+
+		#zoomOverlay {
+			display: none;
+			position: fixed;
+			z-index: 1000;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			background: #000b;
+			align-items: center;
+			justify-content: center;
+		}
+
+		#zoomOverlay img {
+			max-width: 90vw;
+			max-height: 90vh;
+			border-radius: 12px;
+			box-shadow: 0 4px 32px #0008;
+		}
+
+		#zoomOverlay button#closeZoom {
+			position: absolute;
+			top: 32px;
+			right: 48px;
+			background: #fff;
+			border: none;
+			border-radius: 50%;
+			width: 44px;
+			height: 44px;
+			font-size: 2rem;
+			cursor: pointer;
+			box-shadow: 0 2px 8px #0002;
+		}
 	</style>
 </head>
 
@@ -264,19 +310,58 @@ if (!empty($product['size'])) {
 				/ <?= htmlspecialchars($product['name']) ?>
 			</div>
 			<div class="product-page-row">
-				<div class="product-images">
-					<img id="mainImg" src="<?= htmlspecialchars($photos[0] ?? 'images/baby-clothes.png') ?>"
-						class="product-main-img" alt="Product"
-						onclick="document.getElementById('zoomImg').src=this.src;">
-					<img id="zoomImg"
-						src="<?= htmlspecialchars($photos[1] ?? $photos[0] ?? 'images/baby-clothes.png') ?>"
-						class="product-zoom-img" alt="Zoom">
+				<div class="product-images" style="flex-direction:row;align-items:flex-start;gap:32px;">
+					<!-- Vertical thumbnails -->
+					<div style="display:flex;flex-direction:column;gap:16px;">
+						<?php foreach ($photos as $idx => $img): ?>
+							<img src="<?= htmlspecialchars($img) ?>"
+								class="product-thumb<?= $idx === 0 ? ' selected' : '' ?>" data-idx="<?= $idx ?>" alt="Thumb"
+								style="width:100px;height:100px;">
+						<?php endforeach; ?>
+					</div>
+					<!-- Main image with overlays -->
+					<div style="position:relative;width:350px;">
+						<!-- Bluetooth icon overlay (show if product has bluetooth property) -->
+						<?php if (!empty($product['bluetooth'])): ?>
+							<img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bluetooth.svg" alt="Bluetooth"
+								style="position:absolute;top:18px;right:18px;width:38px;height:38px;z-index:3;opacity:0.85;">
+						<?php endif; ?>
+						<!-- Fullscreen/zoom button overlay -->
+						<button id="zoomBtn"
+							style="position:absolute;bottom:18px;right:18px;background:#fff;border:none;border-radius:50%;width:38px;height:38px;box-shadow:0 2px 8px #0002;z-index:3;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+							<svg width="22" height="22" fill="none" stroke="#444" stroke-width="2" viewBox="0 0 24 24">
+								<rect x="3" y="3" width="7" height="7" rx="2" />
+								<rect x="14" y="3" width="7" height="7" rx="2" />
+								<rect x="14" y="14" width="7" height="7" rx="2" />
+								<rect x="3" y="14" width="7" height="7" rx="2" />
+							</svg>
+						</button>
+						<img id="mainImg" src="<?= htmlspecialchars($photos[0] ?? 'images/baby-clothes.png') ?>"
+							class="product-main-img" alt="Product" style="display:block;margin:0 auto; height: 65vh;">
+						<!-- Zoom overlay modal -->
+						<div id="zoomOverlay"
+							style="display:none;position:fixed;z-index:1000;top:0;left:0;width:100vw;height:100vh;background:#000b;align-items:center;justify-content:center;">
+							<img id="zoomImg" src=""
+								style="max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 4px 32px #0008;">
+							<button id="closeZoom"
+								style="position:absolute;top:32px;right:48px;background:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:2rem;cursor:pointer;">&times;</button>
+						</div>
+					</div>
 				</div>
 				<div class="product-info">
 					<div class="product-brand"><a href="index.php" style="color:#f79601;text-decoration:none;">GHM</a>
 					</div>
 					<div class="product-title"><?= htmlspecialchars($product['name']) ?></div>
-					<a href="#" class="product-review">Write a review</a>
+					<?php if (!empty($colors)): ?>
+						<!-- <div class="product-style-label">Color:</div> -->
+						<div class="product-style-thumbs" style="margin-bottom:18px;">
+							<?php foreach ($colors as $c): ?>
+								<span class="product-style-thumb"
+									style="background:<?= htmlspecialchars($c) ?>;border:2px solid #eee;width:32px;height:32px;display:inline-block;cursor:pointer;border-radius:50%;"
+									title="<?= htmlspecialchars($c) ?>"></span>
+							<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
 					<?php if (!empty($product['material'])): ?>
 						<div class="product-material"><strong>Material:</strong>
 							<?= htmlspecialchars($product['material']) ?></div>
@@ -321,18 +406,48 @@ if (!empty($product['size'])) {
 		<?php require_once 'components/footer.php'; ?>
 	</div>
 	<script>
-		function selectStyle(el) {
-			document.querySelectorAll('.product-style-thumb').forEach(e => e.classList.remove('selected'));
-			el.classList.add('selected');
-			document.getElementById('mainImg').src = el.src;
-			document.getElementById('zoomImg').src = el.src;
+		// Slider logic
+		const photos = <?= json_encode($photos) ?>;
+		let currentIdx = 0;
+		const mainImg = document.getElementById('mainImg');
+		const thumbs = document.querySelectorAll('.product-thumb');
+		function updateMainImg(idx) {
+			currentIdx = idx;
+			mainImg.src = photos[idx] || 'images/baby-clothes.png';
+			thumbs.forEach((t, i) => t.classList.toggle('selected', i === idx));
 		}
+		thumbs.forEach((thumb, idx) => {
+			thumb.onclick = () => updateMainImg(idx);
+		});
+		document.getElementById('sliderPrev').onclick = function () {
+			let idx = (currentIdx - 1 + photos.length) % photos.length;
+			updateMainImg(idx);
+		};
+		document.getElementById('sliderNext').onclick = function () {
+			let idx = (currentIdx + 1) % photos.length;
+			updateMainImg(idx);
+		};
 		document.querySelectorAll('.product-size-btn').forEach(btn => {
 			btn.onclick = function () {
 				document.querySelectorAll('.product-size-btn').forEach(b => b.classList.remove('selected'));
 				btn.classList.add('selected');
 			}
 		});
+		// Zoom/fullscreen logic
+		const zoomBtn = document.getElementById('zoomBtn');
+		const zoomOverlay = document.getElementById('zoomOverlay');
+		const zoomImg = document.getElementById('zoomImg');
+		const closeZoom = document.getElementById('closeZoom');
+		zoomBtn.onclick = function () {
+			zoomImg.src = mainImg.src;
+			zoomOverlay.style.display = 'flex';
+		};
+		closeZoom.onclick = function () {
+			zoomOverlay.style.display = 'none';
+		};
+		zoomOverlay.onclick = function (e) {
+			if (e.target === zoomOverlay) zoomOverlay.style.display = 'none';
+		};
 	</script>
 	<script src="js/bootstrap.min.js"></script>
 </body>

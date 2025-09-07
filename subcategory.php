@@ -2,6 +2,7 @@
 require_once 'db/db.php';
 
 $category_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$sub_id = isset($_GET['sub']) ? intval($_GET['sub']) : 0;
 if ($category_id <= 0) {
 	header('Location: index.php');
 	exit;
@@ -46,16 +47,18 @@ $category = $cat_res->fetch_assoc();
 
 		<div class="container mt-5">
 			<h2 class="mb-4"><?= htmlspecialchars($category['name'] ?? 'Category') ?></h2>
-			<?php if (count($subcategories) > 0): ?>
+			<?php if (count($subcategories) > 0 && $sub_id == 0): ?>
 				<div class="row">
 					<?php foreach ($subcategories as $sub): ?>
 						<div class="col-lg-3 col-md-6 mb-4">
 							<div class="category-card">
-								<img src="<?= htmlspecialchars($sub['photo'] ?: 'images/baby-clothes.png') ?>"
-									alt="<?= htmlspecialchars($sub['name']) ?>" class="category-img">
-								<div class="category-info">
-									<div class="category-title"><?= htmlspecialchars($sub['name']) ?></div>
-								</div>
+								<a href="subcategory.php?id=<?= urlencode($category_id) ?>&sub=<?= urlencode($sub['id']) ?>">
+									<img src="<?= htmlspecialchars($sub['photo'] ?: 'images/baby-clothes.png') ?>"
+										alt="<?= htmlspecialchars($sub['name']) ?>" class="category-img">
+									<div class="category-info">
+										<div class="category-title"><?= htmlspecialchars($sub['name']) ?></div>
+									</div>
+								</a>
 							</div>
 						</div>
 					<?php endforeach; ?>
@@ -63,7 +66,11 @@ $category = $cat_res->fetch_assoc();
 			<?php else: ?>
 				<?php
 				$products = [];
-				$prod_res = $conn->query("SELECT name, photo, price FROM product WHERE category_id = $category_id");
+				if ($sub_id > 0) {
+					$prod_res = $conn->query("SELECT id, name, photo, price FROM product WHERE subcategory_id = $sub_id");
+				} else {
+					$prod_res = $conn->query("SELECT id, name, photo, price FROM product WHERE category_id = $category_id");
+				}
 				while ($row = $prod_res->fetch_assoc())
 					$products[] = $row;
 				if (count($products) === 0) {
@@ -71,12 +78,10 @@ $category = $cat_res->fetch_assoc();
 				}
 				?>
 				<div class="row">
-					<?php foreach ($products as $prod):
-						$prod_id_res = $conn->query("SELECT id FROM product WHERE name = '" . $conn->real_escape_string($prod['name']) . "' LIMIT 1");
-						$prod_id = $prod_id_res->fetch_assoc()['id'] ?? 0;
-						?>
+					<?php foreach ($products as $prod): ?>
 						<div class="col-lg-4 col-md-6 item-entry mb-4">
-							<a href="product.php?id=<?= urlencode($prod_id) ?>" class="product-item md-height bg-gray d-block">
+							<a href="product.php?id=<?= urlencode($prod['id']) ?>"
+								class="product-item md-height bg-gray d-block">
 								<?php
 								$photos = json_decode($prod['photo'], true);
 								if (is_array($photos) && count($photos) > 0 && !empty($photos[0])) {
@@ -87,7 +92,7 @@ $category = $cat_res->fetch_assoc();
 								?>
 							</a>
 							<h2 class="item-title"><a
-									href="product.php?id=<?= urlencode($prod_id) ?>"><?= htmlspecialchars($prod['name']) ?></a>
+									href="product.php?id=<?= urlencode($prod['id']) ?>"><?= htmlspecialchars($prod['name']) ?></a>
 							</h2>
 							<?php if (!empty($prod['price'])): ?>
 								<strong class="item-price">₾<?= htmlspecialchars($prod['price']) ?></strong>
