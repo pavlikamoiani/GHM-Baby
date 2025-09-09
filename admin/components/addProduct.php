@@ -30,19 +30,156 @@ while ($row = $res->fetch_assoc())
 	<title>Product Management</title>
 	<link rel="stylesheet" href="../../css/bootstrap.min.css">
 	<style>
+		body {
+			background: #f7f9fb;
+			font-family: 'Segoe UI', Arial, sans-serif;
+		}
+
+		.container {
+			background: #fff;
+			border-radius: 14px;
+			box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+			padding: 32px 28px 24px 28px;
+			margin-top: 40px;
+		}
+
+		.btn {
+			border-radius: 6px !important;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+			font-weight: 500;
+			transition: background 0.2s, color 0.2s;
+		}
+
+		.btn-success,
+		.btn-primary {
+			color: #fff !important;
+		}
+
+		.btn-success {
+			border: none;
+		}
+
+		.btn-primary {
+			border: none;
+		}
+
+		.btn-secondary {
+			background: #e2e8f0 !important;
+			color: #333 !important;
+			border: none;
+		}
+
+		.table {
+			background: #fff;
+			border-radius: 10px;
+			overflow: hidden;
+			box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+		}
+
+		.table th {
+			background: #f1f5f9;
+			border-bottom: 2px solid #e2e8f0;
+			font-weight: 600;
+		}
+
+		.table td,
+		.table th {
+			vertical-align: middle !important;
+			border-top: none;
+		}
+
 		.table-img {
-			width: 40px;
-			height: 40px;
+			width: 44px;
+			height: 44px;
 			object-fit: cover;
-			border-radius: 6px;
+			border-radius: 8px;
+			box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 		}
 
 		.icon-btn {
-			background: none;
+			background: #f1f5f9;
 			border: none;
 			cursor: pointer;
 			font-size: 1.2rem;
 			margin: 0 5px;
+			border-radius: 5px;
+			padding: 6px 10px;
+			transition: background 0.15s;
+		}
+
+		.icon-btn:hover {
+			background: #e2e8f0;
+		}
+
+		.modal-content {
+			border-radius: 12px;
+			box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+		}
+
+		.modal-header {
+			border-bottom: none;
+		}
+
+		.modal-title {
+			font-weight: 600;
+		}
+
+		.form-control {
+			border-radius: 7px;
+			border: 1px solid #e2e8f0;
+			box-shadow: none;
+			margin-bottom: 10px;
+		}
+
+		input[type="file"].form-control {
+			padding: 3px 6px;
+		}
+
+		hr {
+			border-top: 1px solid #e2e8f0;
+		}
+
+		ul {
+			margin-bottom: 0;
+		}
+
+		em {
+			color: #a0aec0;
+		}
+
+		@media (max-width: 700px) {
+			.container {
+				padding: 10px 2vw 10px 2vw;
+				margin-top: 10px;
+				border-radius: 7px;
+			}
+
+			.table th,
+			.table td {
+				font-size: 0.95rem;
+				padding: 6px 4px;
+			}
+
+			.btn,
+			.btn-success,
+			.btn-primary,
+			.btn-secondary {
+				font-size: 1rem !important;
+				padding: 8px 10px !important;
+				margin-bottom: 8px !important;
+				width: 100%;
+				box-sizing: border-box;
+			}
+
+			h2 {
+				font-size: 1.2rem !important;
+				margin-bottom: 12px !important;
+			}
+
+			.table-img {
+				width: 32px;
+				height: 32px;
+			}
 		}
 	</style>
 </head>
@@ -222,12 +359,12 @@ while ($row = $res->fetch_assoc())
 	<script src="../../js/bootstrap.min.js"></script>
 	<script>
 		var subcategories = <?php echo json_encode($subcategories); ?>;
-		$('#category_select').on('change', function () {
+		$('#category_select').on('change', function() {
 			var catId = $(this).val();
 			var subs = subcategories[catId] || [];
 			if (subs.length > 0) {
 				$('#subcategory_select').empty().append('<option value="">Select Subcategory</option>');
-				subs.forEach(function (sub) {
+				subs.forEach(function(sub) {
 					$('#subcategory_select').append('<option value="' + sub.id + '">' + sub.name + '</option>');
 				});
 				$('#subcategory_select').show().prop('required', true);
@@ -236,7 +373,7 @@ while ($row = $res->fetch_assoc())
 			}
 		});
 
-		$(document).on('click', '.btn-edit-product', function () {
+		$(document).on('click', '.btn-edit-product', function() {
 			var tr = $(this).closest('tr');
 			var id = tr.data('id');
 			var name = tr.data('name');
@@ -258,7 +395,7 @@ while ($row = $res->fetch_assoc())
 			try {
 				var photos = JSON.parse(photo);
 				if (Array.isArray(photos) && photos.length > 0) {
-					photos.forEach(function (p) {
+					photos.forEach(function(p) {
 						previewContainer.append('<img src="../../' + p + '" style="width:60px;height:60px;margin-right:5px;">');
 					});
 				} else {
@@ -269,7 +406,7 @@ while ($row = $res->fetch_assoc())
 			}
 
 			$('#edit_category_select').val(category).trigger('change');
-			setTimeout(function () {
+			setTimeout(function() {
 				$('#edit_subcategory_select').val(subcategory);
 			}, 100);
 
@@ -279,7 +416,7 @@ while ($row = $res->fetch_assoc())
 			$('#editProductModal').modal('show');
 		});
 
-		$('#editProductForm').on('submit', function (e) {
+		$('#editProductForm').on('submit', function(e) {
 			e.preventDefault();
 			var formData = new FormData(this);
 			$.ajax({
@@ -288,27 +425,29 @@ while ($row = $res->fetch_assoc())
 				data: formData,
 				processData: false,
 				contentType: false,
-				success: function (resp) {
+				success: function(resp) {
 					location.reload();
 				}
 			});
 		});
 
-		$(document).on('click', '.btn-delete-product', function () {
+		$(document).on('click', '.btn-delete-product', function() {
 			if (!confirm('Delete this product?')) return;
 			var id = $(this).data('id');
-			$.post('deleteProductAction.php', { id: id }, function (resp) {
+			$.post('deleteProductAction.php', {
+				id: id
+			}, function(resp) {
 				location.reload();
 			});
 		});
 
 		var subcategories = <?php echo json_encode($subcategories); ?>;
-		$('#edit_category_select').on('change', function () {
+		$('#edit_category_select').on('change', function() {
 			var catId = $(this).val();
 			var subs = subcategories[catId] || [];
 			$('#edit_subcategory_select').empty().append('<option value="">Select Subcategory</option>');
 			if (subs.length > 0) {
-				subs.forEach(function (sub) {
+				subs.forEach(function(sub) {
 					$('#edit_subcategory_select').append('<option value="' + sub.id + '">' + sub.name + '</option>');
 				});
 				$('#edit_subcategory_select').show().prop('required', true);
@@ -318,12 +457,12 @@ while ($row = $res->fetch_assoc())
 		});
 
 		var subcategoriesAdd = <?php echo json_encode($subcategories); ?>;
-		$('#category_select').on('change', function () {
+		$('#category_select').on('change', function() {
 			var catId = $(this).val();
 			var subs = subcategoriesAdd[catId] || [];
 			if (subs.length > 0) {
 				$('#subcategory_select').empty().append('<option value="">Select Subcategory</option>');
-				subs.forEach(function (sub) {
+				subs.forEach(function(sub) {
 					$('#subcategory_select').append('<option value="' + sub.id + '">' + sub.name + '</option>');
 				});
 				$('#subcategory_select').show().prop('required', true);
@@ -334,13 +473,14 @@ while ($row = $res->fetch_assoc())
 
 		// Color palette logic for add
 		let addColors = [];
-		$('#btn_add_color').on('click', function () {
+		$('#btn_add_color').on('click', function() {
 			const color = $('#color_picker_add').val();
 			if (!addColors.includes(color)) {
 				addColors.push(color);
 				renderColorPalette('add');
 			}
 		});
+
 		function renderColorPalette(type) {
 			let palette = type === 'add' ? $('#color_palette_add') : $('#color_palette_edit');
 			let colors = type === 'add' ? addColors : editColors;
@@ -360,7 +500,7 @@ while ($row = $res->fetch_assoc())
 						position: 'relative'
 					})
 					.attr('title', 'Click to remove')
-					.on('click', function () {
+					.on('click', function() {
 						if (type === 'add') {
 							addColors.splice(idx, 1);
 						} else {
@@ -391,19 +531,20 @@ while ($row = $res->fetch_assoc())
 			});
 			hiddenInput.val(JSON.stringify(colors));
 		}
-		$('form[action="addProductAction.php"]').on('submit', function () {
+		$('form[action="addProductAction.php"]').on('submit', function() {
 			$('#product_color_add').val(JSON.stringify(addColors));
 		});
 
 		// Color palette logic for edit
 		let editColors = [];
-		$('#btn_edit_color').on('click', function () {
+		$('#btn_edit_color').on('click', function() {
 			const color = $('#color_picker_edit').val();
 			if (!editColors.includes(color)) {
 				editColors.push(color);
 				renderColorPalette('edit');
 			}
 		});
+
 		function setEditColorsFromData(data) {
 			try {
 				if (data && data !== '') {
@@ -418,6 +559,7 @@ while ($row = $res->fetch_assoc())
 			}
 			renderColorPalette('edit');
 		}
+
 		function renderColorPalette(type) {
 			let palette = type === 'add' ? $('#color_palette_add') : $('#color_palette_edit');
 			let colors = type === 'add' ? addColors : editColors;
@@ -438,7 +580,7 @@ while ($row = $res->fetch_assoc())
 						position: 'relative'
 					})
 					.attr('title', 'Click to remove')
-					.on('click', function () {
+					.on('click', function() {
 						if (type === 'add') {
 							addColors.splice(idx, 1);
 						} else {
@@ -469,11 +611,11 @@ while ($row = $res->fetch_assoc())
 			});
 			hiddenInput.val(JSON.stringify(colors));
 		}
-		$('#editProductForm').on('submit', function () {
+		$('#editProductForm').on('submit', function() {
 			$('#edit_product_color').val(JSON.stringify(editColors));
 		});
 
-		$(document).on('click', '.btn-edit-product', function () {
+		$(document).on('click', '.btn-edit-product', function() {
 			var tr = $(this).closest('tr');
 			var id = tr.data('id');
 			var name = tr.data('name');
@@ -500,7 +642,7 @@ while ($row = $res->fetch_assoc())
 			try {
 				var photos = JSON.parse(photo);
 				if (Array.isArray(photos) && photos.length > 0) {
-					photos.forEach(function (p) {
+					photos.forEach(function(p) {
 						previewContainer.append('<img src="../../' + p + '" style="width:60px;height:60px;margin-right:5px;">');
 					});
 				} else {
@@ -511,7 +653,7 @@ while ($row = $res->fetch_assoc())
 			}
 
 			$('#edit_category_select').val(category).trigger('change');
-			setTimeout(function () {
+			setTimeout(function() {
 				$('#edit_subcategory_select').val(subcategory);
 			}, 100);
 			setEditColorsFromData(color);

@@ -23,19 +23,156 @@ while ($row = $res->fetch_assoc()) {
 	<title>Category Management</title>
 	<link rel="stylesheet" href="../../css/bootstrap.min.css">
 	<style>
+		body {
+			background: #f7f9fb;
+			font-family: 'Segoe UI', Arial, sans-serif;
+		}
+
+		.container {
+			background: #fff;
+			border-radius: 14px;
+			box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+			padding: 32px 28px 24px 28px;
+			margin-top: 40px;
+		}
+
+		.btn {
+			border-radius: 6px !important;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+			font-weight: 500;
+			transition: background 0.2s, color 0.2s;
+		}
+
+		.btn-success,
+		.btn-primary {
+			color: #fff !important;
+		}
+
+		.btn-success {
+			border: none;
+		}
+
+		.btn-primary {
+			border: none;
+		}
+
+		.btn-secondary {
+			background: #e2e8f0 !important;
+			color: #333 !important;
+			border: none;
+		}
+
+		.table {
+			background: #fff;
+			border-radius: 10px;
+			overflow: hidden;
+			box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+		}
+
+		.table th {
+			background: #f1f5f9;
+			border-bottom: 2px solid #e2e8f0;
+			font-weight: 600;
+		}
+
+		.table td,
+		.table th {
+			vertical-align: middle !important;
+			border-top: none;
+		}
+
 		.table-img {
-			width: 40px;
-			height: 40px;
+			width: 44px;
+			height: 44px;
 			object-fit: cover;
-			border-radius: 6px;
+			border-radius: 8px;
+			box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 		}
 
 		.icon-btn {
-			background: none;
+			background: #f1f5f9;
 			border: none;
 			cursor: pointer;
 			font-size: 1.2rem;
 			margin: 0 5px;
+			border-radius: 5px;
+			padding: 6px 10px;
+			transition: background 0.15s;
+		}
+
+		.icon-btn:hover {
+			background: #e2e8f0;
+		}
+
+		.modal-content {
+			border-radius: 12px;
+			box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+		}
+
+		.modal-header {
+			border-bottom: none;
+		}
+
+		.modal-title {
+			font-weight: 600;
+		}
+
+		.form-control {
+			border-radius: 7px;
+			border: 1px solid #e2e8f0;
+			box-shadow: none;
+			margin-bottom: 10px;
+		}
+
+		input[type="file"].form-control {
+			padding: 3px 6px;
+		}
+
+		hr {
+			border-top: 1px solid #e2e8f0;
+		}
+
+		ul {
+			margin-bottom: 0;
+		}
+
+		em {
+			color: #a0aec0;
+		}
+
+		@media (max-width: 700px) {
+			.container {
+				padding: 10px 2vw 10px 2vw;
+				margin-top: 10px;
+				border-radius: 7px;
+			}
+
+			.table th,
+			.table td {
+				font-size: 0.95rem;
+				padding: 6px 4px;
+			}
+
+			.btn,
+			.btn-success,
+			.btn-primary,
+			.btn-secondary {
+				font-size: 1rem !important;
+				padding: 8px 10px !important;
+				margin-bottom: 8px !important;
+				width: 100%;
+				box-sizing: border-box;
+			}
+
+			h2 {
+				font-size: 1.2rem !important;
+				margin-bottom: 12px !important;
+			}
+
+			.table-img {
+				width: 32px;
+				height: 32px;
+			}
 		}
 	</style>
 </head>
@@ -196,7 +333,7 @@ while ($row = $res->fetch_assoc()) {
 	<script src="../../js/bootstrap.min.js"></script>
 	<script>
 		// Edit button logic for category
-		$('.btn-edit').on('click', function () {
+		$('.btn-edit').on('click', function() {
 			var tr = $(this).closest('tr');
 			var id = tr.data('id');
 			var name = tr.data('name');
@@ -211,7 +348,7 @@ while ($row = $res->fetch_assoc()) {
 			var html = '';
 			if (subs.length) {
 				html += '<label style="font-weight:600;">Subcategories:</label><ul style="padding-left:18px;">';
-				subs.forEach(function (sub) {
+				subs.forEach(function(sub) {
 					html += '<li style="display:flex;align-items:center;margin-bottom:4px;">' +
 						'<img src="../../' + (sub.photo ? sub.photo : 'images/baby-clothes.png') + '" style="width:24px;height:24px;object-fit:cover;border-radius:4px;margin-right:5px;">' +
 						'<span style="flex:1;">' + $('<div>').text(sub.name).html() + '</span>' +
@@ -229,7 +366,7 @@ while ($row = $res->fetch_assoc()) {
 		});
 
 		// Edit form submit for category
-		$('#editCategoryForm').on('submit', function (e) {
+		$('#editCategoryForm').on('submit', function(e) {
 			e.preventDefault();
 			var formData = new FormData(this);
 			$.ajax({
@@ -238,23 +375,25 @@ while ($row = $res->fetch_assoc()) {
 				data: formData,
 				processData: false,
 				contentType: false,
-				success: function (resp) {
+				success: function(resp) {
 					location.reload();
 				}
 			});
 		});
 
 		// Delete button logic for category
-		$('.btn-delete').on('click', function () {
+		$('.btn-delete').on('click', function() {
 			if (!confirm('Delete this category?')) return;
 			var id = $(this).data('id');
-			$.post('deleteCategoryAction.php', { id: id }, function (resp) {
+			$.post('deleteCategoryAction.php', {
+				id: id
+			}, function(resp) {
 				location.reload();
 			});
 		});
 
 		// Use event delegation for dynamically created buttons
-		$(document).on('click', '.btn-edit-subcategory-modal', function () {
+		$(document).on('click', '.btn-edit-subcategory-modal', function() {
 			var id = $(this).data('id');
 			var name = $(this).data('name');
 			var photo = $(this).data('photo');
@@ -264,16 +403,18 @@ while ($row = $res->fetch_assoc()) {
 			$('#editSubcategoryModal').modal('show');
 		});
 
-		$(document).on('click', '.btn-delete-subcategory-modal', function () {
+		$(document).on('click', '.btn-delete-subcategory-modal', function() {
 			if (!confirm('Delete this subcategory?')) return;
 			var id = $(this).data('id');
-			$.post('deleteSubcategoryAction.php', { id: id }, function (resp) {
+			$.post('deleteSubcategoryAction.php', {
+				id: id
+			}, function(resp) {
 				location.reload();
 			});
 		});
 
 		// Edit subcategory form submit
-		$('#editSubcategoryForm').on('submit', function (e) {
+		$('#editSubcategoryForm').on('submit', function(e) {
 			e.preventDefault();
 			var formData = new FormData(this);
 			$.ajax({
@@ -282,7 +423,7 @@ while ($row = $res->fetch_assoc()) {
 				data: formData,
 				processData: false,
 				contentType: false,
-				success: function (resp) {
+				success: function(resp) {
 					location.reload();
 				}
 			});

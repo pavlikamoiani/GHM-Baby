@@ -83,4 +83,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_subcategory'])) {
 	header('Location: addCategory.php');
 	exit;
 }
-?>

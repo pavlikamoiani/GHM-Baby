@@ -94,7 +94,7 @@ while ($row = $res->fetch_assoc())
         foreach ($products as $prod):
           // id теперь есть сразу
           $prod_id = $prod['id'];
-          ?>
+        ?>
           <div class="col-lg-4 col-md-6 item-entry mb-4">
             <a href="product.php?id=<?= urlencode($prod_id) ?>" class="product-item md-height bg-gray d-block">
               <?php
@@ -133,7 +133,7 @@ while ($row = $res->fetch_assoc())
             while ($row = $res->fetch_assoc())
               $rated_products[] = $row;
             foreach ($rated_products as $prod):
-              ?>
+            ?>
               <div class="item">
                 <div class="item-entry">
                   <a href="product.php?id=<?= urlencode($prod['id']) ?>" class="product-item md-height bg-gray d-block">
@@ -178,7 +178,7 @@ while ($row = $res->fetch_assoc())
             <p><a href="#products" class="btn btn-black rounded-0">Shop Now</a></p>
           </div>
         </div>
-        <div class="col-md-6 order-1 align-self-end">
+        <div class="col-md-6 order-1 align-self-end footer-img">
           <img src="images/footer-image.png" alt="Image" class="img-fluid">
         </div>
       </div>

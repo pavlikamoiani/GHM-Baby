@@ -1307,6 +1307,10 @@ a:hover {
     height: 300px !important;
     margin-bottom: 30px;
   }
+
+  .footer-img {
+    display: none;
+  }
 }
 
 .product-item.bg-gray {
