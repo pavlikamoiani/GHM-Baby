@@ -356,13 +356,37 @@ while ($row = $res->fetch_assoc())
 						background: c,
 						border: '2px solid #ccc',
 						cursor: 'pointer',
-						'margin-right': '2px'
+						'margin-right': '2px',
+						position: 'relative'
 					})
-					.attr('title', c)
+					.attr('title', 'Click to remove')
 					.on('click', function () {
-						colors.splice(idx, 1);
+						if (type === 'add') {
+							addColors.splice(idx, 1);
+						} else {
+							editColors.splice(idx, 1);
+						}
 						renderColorPalette(type);
 					});
+
+				// Add a small x in the corner
+				const xMark = $('<span>')
+					.text('×')
+					.css({
+						position: 'absolute',
+						top: '-8px',
+						right: '-8px',
+						background: '#fff',
+						borderRadius: '50%',
+						width: '16px',
+						height: '16px',
+						lineHeight: '14px',
+						textAlign: 'center',
+						border: '1px solid #ccc',
+						fontSize: '12px'
+					});
+
+				span.append(xMark);
 				palette.append(span);
 			});
 			hiddenInput.val(JSON.stringify(colors));
@@ -382,10 +406,68 @@ while ($row = $res->fetch_assoc())
 		});
 		function setEditColorsFromData(data) {
 			try {
-				const arr = JSON.parse(data);
-				editColors = Array.isArray(arr) ? arr : [];
-			} catch (e) { editColors = []; }
+				if (data && data !== '') {
+					const arr = JSON.parse(data);
+					editColors = Array.isArray(arr) ? arr : [];
+				} else {
+					editColors = [];
+				}
+			} catch (e) {
+				console.log('Error parsing color data:', e);
+				editColors = [];
+			}
 			renderColorPalette('edit');
+		}
+		function renderColorPalette(type) {
+			let palette = type === 'add' ? $('#color_palette_add') : $('#color_palette_edit');
+			let colors = type === 'add' ? addColors : editColors;
+			let hiddenInput = type === 'add' ? $('#product_color_add') : $('#edit_product_color');
+
+			palette.empty();
+			colors.forEach((c, idx) => {
+				const span = $('<span>')
+					.css({
+						display: 'inline-block',
+						width: '28px',
+						height: '28px',
+						'border-radius': '50%',
+						background: c,
+						border: '2px solid #ccc',
+						cursor: 'pointer',
+						'margin-right': '2px',
+						position: 'relative'
+					})
+					.attr('title', 'Click to remove')
+					.on('click', function () {
+						if (type === 'add') {
+							addColors.splice(idx, 1);
+						} else {
+							editColors.splice(idx, 1);
+						}
+						renderColorPalette(type);
+					});
+
+				// Add a small x in the corner
+				const xMark = $('<span>')
+					.text('×')
+					.css({
+						position: 'absolute',
+						top: '-8px',
+						right: '-8px',
+						background: '#fff',
+						borderRadius: '50%',
+						width: '16px',
+						height: '16px',
+						lineHeight: '14px',
+						textAlign: 'center',
+						border: '1px solid #ccc',
+						fontSize: '12px'
+					});
+
+				span.append(xMark);
+				palette.append(span);
+			});
+			hiddenInput.val(JSON.stringify(colors));
 		}
 		$('#editProductForm').on('submit', function () {
 			$('#edit_product_color').val(JSON.stringify(editColors));
@@ -400,11 +482,18 @@ while ($row = $res->fetch_assoc())
 			var size = tr.data('size');
 			var material = tr.data('material');
 			var color = tr.data('color');
+			var category = tr.data('category');
+			var subcategory = tr.data('subcategory');
+
 			$('#edit_product_id').val(id);
 			$('#edit_product_name').val(name);
 			$('#edit_product_price').val(price);
 			$('#edit_product_size').val(size);
 			$('#edit_product_material').val(material);
+
+			// Clear and repopulate colors
+			editColors = [];
+			setEditColorsFromData(color);
 
 			var previewContainer = $('#edit_product_preview_container');
 			previewContainer.empty();

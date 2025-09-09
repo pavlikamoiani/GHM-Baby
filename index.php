@@ -87,13 +87,13 @@ while ($row = $res->fetch_assoc())
       <div class="row">
         <?php
         $products = [];
-        $prod_res = $conn->query("SELECT name, photo, price FROM product ORDER BY id DESC LIMIT 12");
+        // Исправлено: сразу выбираем id
+        $prod_res = $conn->query("SELECT id, name, photo, price FROM product ORDER BY id DESC LIMIT 12");
         while ($row = $prod_res->fetch_assoc())
           $products[] = $row;
         foreach ($products as $prod):
-          // Add product id to query
-          $prod_id_res = $conn->query("SELECT id FROM product WHERE name = '" . $conn->real_escape_string($prod['name']) . "' LIMIT 1");
-          $prod_id = $prod_id_res->fetch_assoc()['id'] ?? 0;
+          // id теперь есть сразу
+          $prod_id = $prod['id'];
           ?>
           <div class="col-lg-4 col-md-6 item-entry mb-4">
             <a href="product.php?id=<?= urlencode($prod_id) ?>" class="product-item md-height bg-gray d-block">
@@ -129,14 +129,14 @@ while ($row = $res->fetch_assoc())
           <div class="nonloop-block-3 owl-carousel">
             <?php
             $rated_products = [];
-            $res = $conn->query("SELECT name, photo, price FROM product ORDER BY id DESC LIMIT 10");
+            $res = $conn->query("SELECT id, name, photo, price FROM product ORDER BY id DESC LIMIT 10");
             while ($row = $res->fetch_assoc())
               $rated_products[] = $row;
             foreach ($rated_products as $prod):
               ?>
               <div class="item">
                 <div class="item-entry">
-                  <a href="#" class="product-item md-height bg-gray d-block">
+                  <a href="product.php?id=<?= urlencode($prod['id']) ?>" class="product-item md-height bg-gray d-block">
                     <?php
                     $photos = json_decode($prod['photo'], true);
                     if (is_array($photos) && count($photos) > 0 && !empty($photos[0])) {
@@ -146,7 +146,8 @@ while ($row = $res->fetch_assoc())
                     }
                     ?>
                   </a>
-                  <h2 class="item-title"><a href="#"><?= htmlspecialchars($prod['name']) ?></a></h2>
+                  <h2 class="item-title"><a
+                      href="product.php?id=<?= urlencode($prod['id']) ?>"><?= htmlspecialchars($prod['name']) ?></a></h2>
                   <?php if (!empty($prod['price'])): ?>
                     <strong class="item-price">₾<?= htmlspecialchars($prod['price']) ?></strong>
                   <?php endif; ?>
