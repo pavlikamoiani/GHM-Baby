@@ -35,18 +35,74 @@
 					</div>
 					<hr style="margin:0 0 20px 0; border-top:1px solid #eee;">
 					<ul class="navbar-nav px-3" style="font-size: 17px;">
-						<li class="nav-item mb-2"><a class="nav-link" href="index.php"
+						<li class="nav-item mb-2">
+							<a class="nav-link" href="index.php"
 								style="color:#444; padding:10px; border-radius:8px; transition:background 0.2s;"><span
-									class="icon-home"></span>მთავარი</a></li>
-						<li class="nav-item mb-2"><a class="nav-link" href="#category"
-								style="color:#444; padding:10px; border-radius:8px; transition:background 0.2s;"><span
-									class="icon-list"></span>კატეგორია</a></li>
+									class="icon-home"></span>მთავარი</a>
+						</li>
+						<li class="nav-item mb-2 dropdown-category">
+							<a class="nav-link" href="#category" id="categoryDropdownBtn"
+								style="color:#444; padding:10px; gap: 20px; border-radius:8px; transition:background 0.2s; cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+								<span style="display:flex; align-items:center; gap:20px;"><span
+										class="icon-list"></span>კატეგორია</span>
+								<span style="margin-left:8px;" id="dropdownArrow">&#9662;</span>
+							</a>
+							<ul class="dropdown-menu-category" id="dropdownMenuCategory"
+								style="display:none; list-style:none; padding-left:20px; margin:0;">
+								<?php
+								require_once(__DIR__ . '/../db/db.php');
+								if ($conn->connect_errno) {
+									echo "<li>DB Error</li>";
+								} else {
+									$catResult = $conn->query("SELECT id, name FROM category ORDER BY name ASC");
+									if ($catResult && $catResult->num_rows > 0) {
+										while ($cat = $catResult->fetch_assoc()) {
+											$subResult = $conn->query("SELECT id, name FROM subcategory WHERE category_id=" . intval($cat['id']) . " ORDER BY name ASC");
+											$hasSub = $subResult && $subResult->num_rows > 0;
+											?>
+											<li class="dropdown-subcategory">
+												<a href="subcategory.php?id=<?php echo $cat['id']; ?>" class="category-link" style="color:#444; padding:7px 0; display:flex; align-items:center; justify-content:space-between;<?php if ($hasSub)
+													   echo ' cursor:pointer;'; ?>" <?php if ($hasSub)
+															 echo 'onclick="event.preventDefault(); toggleSubcategory(this);"'; ?>>
+													<span><?php echo htmlspecialchars($cat['name']); ?></span>
+													<?php if ($hasSub) { ?>
+														<span class="subcategory-arrow" style="margin-left:8px;">&#9656;</span>
+													<?php } ?>
+												</a>
+												<?php if ($hasSub) { ?>
+													<ul class="subcategory-menu"
+														style="display:none; list-style:none; padding-left:18px; margin:0;">
+														<?php while ($sub = $subResult->fetch_assoc()) { ?>
+															<li>
+																<a href="subcategory.php?id=<?php echo $cat['id']; ?>&sub=<?php echo $sub['id']; ?>"
+																	style="color:#444; padding:7px 0; display:block;">
+																	<?php echo htmlspecialchars($sub['name']); ?>
+																</a>
+															</li>
+														<?php } ?>
+													</ul>
+												<?php }
+												$subResult && $subResult->free();
+												?>
+											</li>
+											<?php
+										}
+									} else {
+										echo "<li>კატეგორიები არ მოიძებნა</li>";
+									}
+									$catResult && $catResult->free();
+								}
+								?>
+							</ul>
+						</li>
 						<li class="nav-item mb-2"><a class="nav-link" href="#"
 								style="color:#444; padding:10px; border-radius:8px; transition:background 0.2s;"><span
-									class="icon-info"></span>ჩვენს შესახებ</a></li>
+									class="icon-info"></span>ჩვენს შესახებ</a>
+						</li>
 						<li class="nav-item"><a class="nav-link" href="#"
 								style="color:#444; padding:10px; border-radius:8px; transition:background 0.2s;"><span
-									class="icon-phone"></span>კონტაქტი</a></li>
+									class="icon-phone"></span>კონტაქტი</a>
+						</li>
 					</ul>
 				</div>
 				<div id="sidebarOverlay"></div>
@@ -86,6 +142,49 @@
 		sidebarMenu.classList.remove('active');
 		sidebarOverlay.style.display = 'none';
 		document.body.style.overflow = '';
+	};
+	// Dropdown for კატეგორია
+	const categoryDropdownBtn = document.getElementById('categoryDropdownBtn');
+	const dropdownMenuCategory = document.getElementById('dropdownMenuCategory');
+	const dropdownArrow = document.getElementById('dropdownArrow');
+	let dropdownOpen = false;
+	categoryDropdownBtn.onclick = function (e) {
+		e.preventDefault();
+		dropdownOpen = !dropdownOpen;
+		dropdownMenuCategory.style.display = dropdownOpen ? 'block' : 'none';
+		dropdownArrow.innerHTML = dropdownOpen ? '&#9652;' : '&#9662;';
+	};
+	// Optional: close dropdown when clicking outside
+	document.addEventListener('click', function (event) {
+		if (!categoryDropdownBtn.contains(event.target) && !dropdownMenuCategory.contains(event.target)) {
+			dropdownMenuCategory.style.display = 'none';
+			dropdownArrow.innerHTML = '&#9662;';
+			dropdownOpen = false;
+			// Close all subcategory menus
+			document.querySelectorAll('.subcategory-menu').forEach(function (el) {
+				el.style.display = 'none';
+				const arrow = el.parentElement.querySelector('.subcategory-arrow');
+				if (arrow) arrow.innerHTML = '&#9656;';
+			});
+		}
+	});
+	// Toggle subcategory dropdown
+	window.toggleSubcategory = function (el) {
+		const menu = el.parentElement.querySelector('.subcategory-menu');
+		const arrow = el.querySelector('.subcategory-arrow');
+		if (menu.style.display === 'block') {
+			menu.style.display = 'none';
+			if (arrow) arrow.innerHTML = '&#9656;';
+		} else {
+			// Close others
+			document.querySelectorAll('.subcategory-menu').forEach(function (el2) {
+				el2.style.display = 'none';
+				const arrow2 = el2.parentElement.querySelector('.subcategory-arrow');
+				if (arrow2) arrow2.innerHTML = '&#9656;';
+			});
+			menu.style.display = 'block';
+			if (arrow) arrow.innerHTML = '&#9662;';
+		}
 	};
 </script>
 

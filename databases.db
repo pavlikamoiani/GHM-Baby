@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS product (
     price DECIMAL(10,2) DEFAULT NULL,
     size VARCHAR(50) DEFAULT NULL,
     material VARCHAR(100) DEFAULT NULL,
-    color TEXT DEFAULT NULL, -- new: store multiple colors as JSON
     category_id INT NOT NULL,
     subcategory_id INT DEFAULT NULL,
     FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE,

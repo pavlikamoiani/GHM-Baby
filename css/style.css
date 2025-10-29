@@ -1,12 +1,5 @@
-@font-face {
-  font-family: "BPG Rioni Arial";
-  src: url("fonts/bpg_rioni_arial.otf") format("opentype");
-}
-
 * {
   scroll-behavior: smooth;
-  font-family: "BPG Rioni Arial", "Noto Sans Georgian", sans-serif;
-
 }
 
 /* Base */
@@ -28,6 +21,13 @@ body {
 }
 
 a {
+  @font-face {
+    font-family: 'BPG Rioni Arial';
+    src: url('../fonts/bpg_rioni_arial.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
   -webkit-transition: .3s all ease;
   -o-transition: .3s all ease;
   transition: .3s all ease;

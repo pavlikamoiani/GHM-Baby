@@ -63,7 +63,6 @@ if (!empty($product['size'])) {
 	<style>
 		@font-face {
 			font-family: "BPG Rioni Arial";
-			src: url("fonts/bpg_rioni_arial.otf") format("opentype");
 		}
 
 		body {

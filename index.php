@@ -1,4 +1,10 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
+
+<?php
 require_once 'db/db.php';
 $categories = [];
 $res = $conn->query("SELECT id, name, photo FROM category");
@@ -94,7 +100,7 @@ while ($row = $res->fetch_assoc())
         foreach ($products as $prod):
           // id теперь есть сразу
           $prod_id = $prod['id'];
-        ?>
+          ?>
           <div class="col-lg-4 col-md-6 item-entry mb-4">
             <a href="product.php?id=<?= urlencode($prod_id) ?>" class="product-item md-height bg-gray d-block">
               <?php
@@ -133,7 +139,7 @@ while ($row = $res->fetch_assoc())
             while ($row = $res->fetch_assoc())
               $rated_products[] = $row;
             foreach ($rated_products as $prod):
-            ?>
+              ?>
               <div class="item">
                 <div class="item-entry">
                   <a href="product.php?id=<?= urlencode($prod['id']) ?>" class="product-item md-height bg-gray d-block">

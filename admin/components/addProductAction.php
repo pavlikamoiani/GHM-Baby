@@ -35,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
 	$price = $_POST['product_price'] ?? null;
 	$size = $_POST['product_size'] ?? null;
 	$material = $_POST['product_material'] ?? null;
-	$color = $_POST['product_color'] ?? null; // new
 	$photoPaths = [];
 	$photo = '';
 
@@ -64,13 +63,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
 		$photo = json_encode($photoPaths);
 	}
 
-	$stmt = $conn->prepare("INSERT INTO product (name, photo, price, size, material, color, category_id, subcategory_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+	$stmt = $conn->prepare("INSERT INTO product (name, photo, price, size, material, category_id, subcategory_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
 	// If subcategory_id is empty, set to null
 	if ($subcategory_id) {
-		$stmt->bind_param("ssdsssis", $name, $photo, $price, $size, $material, $color, $category_id, $subcategory_id);
+		$stmt->bind_param("ssdsssi", $name, $photo, $price, $size, $material, $category_id, $subcategory_id);
 	} else {
 		$null = null;
-		$stmt->bind_param("ssdsssis", $name, $photo, $price, $size, $material, $color, $category_id, $null);
+		$stmt->bind_param("ssdsssi", $name, $photo, $price, $size, $material, $category_id, $null);
 	}
 	$stmt->execute();
 	$stmt->close();
