@@ -5,6 +5,16 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	<link rel="stylesheet" href="css/jquery-ui.css">
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/aos.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700">
+	<link rel="stylesheet" href="fonts/icomoon/style.css">
 </head>
 
 <body>
@@ -95,7 +105,7 @@
 								?>
 							</ul>
 						</li>
-						<li class="nav-item mb-2"><a class="nav-link" href="#"
+						<li class="nav-item mb-2"><a class="nav-link" href="about.php"
 								style="color:#444; padding:10px; border-radius:8px; transition:background 0.2s;"><span
 									class="icon-info"></span>ჩვენს შესახებ</a>
 						</li>

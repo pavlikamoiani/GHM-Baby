@@ -391,7 +391,7 @@ if (!empty($product['size'])) {
 								style="position:absolute;top:18px;right:18px;width:38px;height:38px;z-index:3;opacity:0.85;">
 						<?php endif; ?>
 						<!-- Fullscreen/zoom button overlay -->
-						<button id="zoomBtn"
+						<!-- <button id="zoomBtn"
 							style="position:absolute;bottom:18px;right:18px;background:#fff;border:none;border-radius:50%;width:38px;height:38px;box-shadow:0 2px 8px #0002;z-index:3;cursor:pointer;display:flex;align-items:center;justify-content:center;">
 							<svg width="22" height="22" fill="none" stroke="#444" stroke-width="2" viewBox="0 0 24 24">
 								<rect x="3" y="3" width="7" height="7" rx="2" />
@@ -399,9 +399,9 @@ if (!empty($product['size'])) {
 								<rect x="14" y="14" width="7" height="7" rx="2" />
 								<rect x="3" y="14" width="7" height="7" rx="2" />
 							</svg>
-						</button>
+						</button> -->
 						<img id="mainImg" src="<?= htmlspecialchars($photos[0] ?? 'images/baby-clothes.png') ?>"
-							class="product-main-img" alt="Product" style="display:block;margin:0 auto; height: 65vh;">
+							class="product-main-img" alt="Product" style="display:block;margin:0 auto; height: auto;">
 						<!-- Zoom overlay modal -->
 						<div id="zoomOverlay"
 							style="display:none;position:fixed;z-index:1000;top:0;left:0;width:100vw;height:100vh;background:#000b;align-items:center;justify-content:center;">
